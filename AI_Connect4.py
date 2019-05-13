@@ -1,52 +1,79 @@
 import numpy as np
+import math
+import random
 # initial values for alpha and beta
-MAX, MIN = 100000, -100000 
+MAX, MIN = math.inf, -math.inf 
 ROWS,COLUMNS=6,7
 def creatBoard():
   board = np.zeros((ROWS,COLUMNS))
   return board
 def printBoard(board):
 	print(np.flip(board, 0))
-def minimax(depth, nodeIndex, maximizingPlayer,board, alpha, beta):
-    # leaf node is reached  
-    if depth == 7:  
-        return board[nodeIndex]  
 
+def children(board):
+  return board.copy()
+	# play(bCopy,row, col,2)
+def play(board,row,col,val):
+  board[row][col] = val
+def getNextRow(board,col):
+  for r in range(ROWS):
+    if board[r][col] == 0:
+      return r
+def minimax(depth,maximizingPlayer,board, alpha, beta):
+    possibleLocations=getPossibleLocations(board)
+    # leaf node is reached 
+    isterminal=isTerminal(board)
+    if depth == 7 or isTerminal:
+      if isterminal:
+        # AI wins
+        if winning(board, 2):
+          return (None, math.inf)
+        # player wins
+        elif winning(board,1):
+          return (None, -math.inf)
+        else: # Game is over, no more valid moves
+          return (None, 0)
+      # depth is 7 
+      else:
+        return (None, utility(board,2))
     if maximizingPlayer:  
-       
-        best = MIN 
-  
-        # Recur for left and right children  
-        for i in range(0, 2):  
-              
-            val = minimax(depth + 1, nodeIndex * 2 + i,  
-                          False, board, alpha, beta)  
-            best = max(best, val)  
-            alpha = max(alpha, best)  
-  
-            # Alpha Beta Pruning  
-            if beta <= alpha:  
-                break 
-           
-        return best  
+      val = MIN
+      column=random.choice(possibleLocations)
+      # Recur  
+      for col in possibleLocations:
+          row=getNextRow(board,col)
+          newBoard=children(board)
+          play(newBoard,row,col,2)
+          newVal=minimax(depth + 1,False, newBoard, alpha, beta)[1]
+          if newVal > val:
+            val = newVal
+            column = col
+
+          alpha = max(alpha, val)
+          # Alpha Beta Pruning 
+          if alpha >= beta:
+            break
+
+      return column,val 
        
     else: 
-        best = MAX 
-  
-        # Recur for left and  
-        # right children  
-        for i in range(0, 2):  
-           
-            val = minimax(depth + 1, nodeIndex * 2 + i,  
-                            True, board, alpha, beta)  
-            best = min(best, val)  
-            beta = min(beta, best)  
-  
-            # Alpha Beta Pruning  
-            if beta <= alpha:  
-                break 
-           
-        return best 
+      val = MAX 
+      column = random.choice(possibleLocations)
+      # Recur
+      for col in possibleLocations:
+        row=getNextRow(board,col)
+        newBoard=children(board)
+        play(newBoard,row,col,2)
+        newVal = minimax(depth + 1,True, newBoard, alpha, beta)  
+        if newVal < val:
+          val = newVal
+          column = col
+
+        beta = min(beta, val)
+        # Alpha Beta Pruning  
+        if beta <= alpha:
+          break 
+      return column,val 
         
 if __name__ == "__main__":
   board = creatBoard()
