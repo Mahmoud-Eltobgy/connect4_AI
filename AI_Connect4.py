@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import random
+from winning import *
 # initial values for alpha and beta
 MAX, MIN = math.inf, -math.inf 
 ROWS,COLUMNS=6,7
@@ -19,6 +20,14 @@ def getNextRow(board,col):
   for r in range(ROWS):
     if board[r][col] == 0:
       return r
+def isValidLocation(board, col):
+  return board[ROWS-1][col] == 0
+def getPossibleLocations(board):
+  valid_locations = []
+  for col in range(COLUMNS):
+    if isValidLocation(board, col):
+      valid_locations.append(col)
+  return valid_locations
 def minimax(depth,maximizingPlayer,board, alpha, beta):
     possibleLocations=getPossibleLocations(board)
     # leaf node is reached 
