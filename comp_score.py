@@ -1,8 +1,5 @@
 def score_comp (board):
     score = 0 
-
-
-
     #Horizontal
     for y in range(6):
         for x in range(4):
@@ -30,12 +27,6 @@ def score_comp (board):
                         
                 if (board[y][x-1]==board[y][x-2]==2 and board[y][x-3]==0):
                     score += 3
-
-
-
-
-
-
 
 
     #Vertical
@@ -99,5 +90,3 @@ def score_comp (board):
 
 
     return score 
-
-    

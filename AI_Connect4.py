@@ -2,6 +2,8 @@ import numpy as np
 import math
 import random
 from winning import *
+from comp_score import *
+from user_score import *
 # initial values for alpha and beta
 MAX, MIN = math.inf, -math.inf 
 ROWS,COLUMNS=6,7
@@ -21,6 +23,7 @@ def getNextRow(board,col):
     if board[r][col] == 0:
       return r
 def isValidLocation(board, col):
+  # print(type(col),type(ROWS-1))
   return board[ROWS-1][col] == 0
 def getPossibleLocations(board):
   valid_locations = []
@@ -28,23 +31,25 @@ def getPossibleLocations(board):
     if isValidLocation(board, col):
       valid_locations.append(col)
   return valid_locations
+def isTerminal(board):
+  return winning(board,1) or winning(board, 2) or len(getPossibleLocations(board)) == 0
 def minimax(depth,maximizingPlayer,board, alpha, beta):
     possibleLocations=getPossibleLocations(board)
     # leaf node is reached 
     isterminal=isTerminal(board)
-    if depth == 7 or isTerminal:
+    if depth == 7 or isterminal:
       if isterminal:
         # AI wins
-        if winning(board, 2):
-          return (None, math.inf)
+        if winning(board,2):
+          return (None, 100000000000000)
         # player wins
         elif winning(board,1):
-          return (None, -math.inf)
+          return (None, -100000000000000)
         else: # Game is over, no more valid moves
           return (None, 0)
       # depth is 7 
       else:
-        return (None, utility(board,2))
+        return (None, score_comp(board))
     if maximizingPlayer:  
       val = MIN
       column=random.choice(possibleLocations)
@@ -59,6 +64,7 @@ def minimax(depth,maximizingPlayer,board, alpha, beta):
             column = col
 
           alpha = max(alpha, val)
+          print(alpha,val)
           # Alpha Beta Pruning 
           if alpha >= beta:
             break
@@ -73,11 +79,10 @@ def minimax(depth,maximizingPlayer,board, alpha, beta):
         row=getNextRow(board,col)
         newBoard=children(board)
         play(newBoard,row,col,2)
-        newVal = minimax(depth + 1,True, newBoard, alpha, beta)  
+        newVal = minimax(depth + 1,True, newBoard, alpha, beta)[1]  
         if newVal < val:
           val = newVal
           column = col
-
         beta = min(beta, val)
         # Alpha Beta Pruning  
         if beta <= alpha:
@@ -92,14 +97,30 @@ if __name__ == "__main__":
   while not gameOver:
     # ask for player one col input
     if turn==0:
-      col=input("first player selection (0-6): ")
-      # checking for  the next available row
-      # then drop the ball into board[row][col]
-        # check if it's the winning move or not 
-        # flip the gameOver flag if it's the winning move 
+      col=int(input("first player selection (0-6): "))
+      # check if the location is valid
+      if isValidLocation(board,col):
+
+        # checking for  the next available row
+        row = getNextRow(board,col)
+        play(board,row,col,1)
+        printBoard(board)
+        # cheking if the it's a winning move
+        if winning(board,1):
+          print("player 1 Wins!")
+          gameOver = True
     else:
-      pass
+      
       # get the AI's row and col of the best move 
+      col,minimaxScore=minimax(0,True,board,MIN,MAX)
+      print(col,minimaxScore)
+      if isValidLocation(board,col):
+        row=getNextRow(board,col)
+        play(board,row,col,2)
+        printBoard(board)
+        if winning(board,2):
+          print('Our Amazing Algorithm wins!')
+          gameOver=True
       # then drop the ball into board[row][col]
       # check if it's the winning move or not 
         # flip the gameOver flag if it's the winning move 
