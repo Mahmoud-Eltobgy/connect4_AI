@@ -1,4 +1,4 @@
-def score-comp (board):
+def score_comp (board):
     score = 0 
 
 
