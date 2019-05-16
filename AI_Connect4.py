@@ -64,7 +64,7 @@ def minimax(depth,maximizingPlayer,board, alpha, beta):
             column = col
 
           alpha = max(alpha, val)
-          print(alpha,val)
+          # print(alpha,val)
           # Alpha Beta Pruning 
           if alpha >= beta:
             break
@@ -113,7 +113,7 @@ if __name__ == "__main__":
       
       # get the AI's row and col of the best move 
       col,minimaxScore=minimax(0,True,board,MIN,MAX)
-      print(col,minimaxScore)
+      print(col)
       if isValidLocation(board,col):
         row=getNextRow(board,col)
         play(board,row,col,2)
